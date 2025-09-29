@@ -7,10 +7,6 @@ import "./randomChar.scss";
 import mjolnir from "../../resources/img/mjolnir.png";
 
 class RandomChar extends Component {
-  constructor(props) {
-    super(props);
-    this.updateChar();
-  }
 
   state = {
     char: {},
@@ -20,8 +16,19 @@ class RandomChar extends Component {
 
   marvelService = new MarvelService();
 
+  componentDidMount() {
+    this.updateChar();
+  }
+
   onCharLoaded = (char) => {
     this.setState({ char, loading: false });
+  };
+
+  onCharLoading = () => {
+    this.setState({
+      loading: true,
+      error: false,
+    });
   };
 
   onError = () => {
@@ -33,11 +40,13 @@ class RandomChar extends Component {
 
   updateChar = () => {
     const id = Math.floor(Math.random() * 20);
+    this.onCharLoading();
     this.marvelService
       .getCharacter(id)
       .then(this.onCharLoaded)
       .catch(this.onError);
   };
+
 
   render() {
     const { char, loading, error } = this.state;
@@ -50,18 +59,7 @@ class RandomChar extends Component {
         {errorMessage}
         {spinner}
         {content}
-        <div className="randomchar__static">
-          <p className="randomchar__title">
-            Random character for today!
-            <br />
-            Do you want to get to know him better?
-          </p>
-          <p className="randomchar__title">Or choose another one</p>
-          <button className="button button__main">
-            <div className="inner">try it</div>
-          </button>
-          <img src={mjolnir} alt="mjolnir" className="randomchar__decoration" />
-        </div>
+        <Static updateChar={this.updateChar} />
       </div>
     );
   }
@@ -85,6 +83,23 @@ const View = ({ char }) => {
           </a>
         </div>
       </div>
+    </div>
+  );
+};
+
+const Static = ({ updateChar }) => {
+  return (
+    <div className="randomchar__static">
+      <p className="randomchar__title">
+        Random character for today!
+        <br />
+        Do you want to get to know him better?
+      </p>
+      <p className="randomchar__title">Or choose another one</p>
+      <button onClick={() => updateChar()} className="button button__main">
+        <div className="inner">try it</div>
+      </button>
+      <img src={mjolnir} alt="mjolnir" className="randomchar__decoration" />
     </div>
   );
 };
