@@ -11,27 +11,48 @@ class CharList extends Component {
     characters: [],
     loading: true,
     error: false,
+    newItemLoading: false,
+    offset: 0,
+    charEnded: false,
   };
 
   marvelService = new MarvelService();
 
   componentDidMount() {
+    this.onRequest();
+  }
+
+  onRequest = (offset) => {
+    this.onCharListLoading();
     this.marvelService
-      .getAllCharacters()
+      .getAllCharacters(offset)
       .then(this.onCharListLoaded)
       .catch(this.onError);
-  }
+  };
+
+  onCharListLoading = () => {
+    this.setState({
+      newItemLoading: true,
+    });
+  };
+
+  onCharListLoaded = (newCharList) => {
+    let ended = false;
+    if (newCharList.length < 9) {
+      ended = true;
+    }
+    this.setState(({ offset, characters }) => ({
+      characters: [...characters, ...newCharList],
+      loading: false,
+      newItemLoading: false,
+      offset: offset + 9,
+      charEnded: ended,
+    }));
+  };
 
   onError = () => {
     this.setState({
       error: true,
-      loading: false,
-    });
-  };
-
-  onCharListLoaded = (charList) => {
-    this.setState({
-      characters: charList,
       loading: false,
     });
   };
@@ -57,7 +78,8 @@ class CharList extends Component {
   }
 
   render() {
-    const { characters, loading, error } = this.state;
+    const { characters, loading, error, offset, newItemLoading, charEnded } =
+      this.state;
     const items = this.renderItems(characters);
     const errorMessage = error ? <ErrorMessage /> : null;
     const spinner = loading ? <Spinner /> : null;
@@ -67,7 +89,12 @@ class CharList extends Component {
         {errorMessage}
         {spinner}
         {content}
-        <button className="button button__main button__long">
+        <button
+          onClick={() => this.onRequest(offset)}
+          disabled={newItemLoading}
+          style={{ display: charEnded ? "none" : "block" }}
+          className="button button__main button__long"
+        >
           <div className="inner">Load more</div>
         </button>
       </div>
