@@ -3,7 +3,6 @@ import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import img from "../errorMessage/error.gif";
 import MarvelService from "../../services/MarvelService";
-import { v4 as uuidv4 } from "uuid";
 
 import "./charList.scss";
 
@@ -29,24 +28,26 @@ class CharList extends Component {
       loading: false,
     });
   };
-  
+
   onCharListLoaded = (charList) => {
-    const charWidthID = charList.map((item) => ({ ...item, id: uuidv4() }));
     this.setState({
-      characters: charWidthID,
+      characters: charList,
       loading: false,
     });
   };
-
-
 
   renderItems(arr) {
     const problemUrl =
       "https://www.wallpaperflare.com/static/264/707/824/iron-man-the-avengers-robert-downey-junior-tony-wallpaper.jpg";
     const characterItems = arr.map((item) => {
+      if (!item || typeof item !== "object") return null;
       const thumbnail = item.thumbnail === problemUrl ? img : item.thumbnail;
       return (
-        <li className="char__item" key={item.id}>
+        <li
+          className="char__item"
+          key={item.id}
+          onClick={() => this.props.onCharSelected(item.id)}
+        >
           <img src={thumbnail} alt={item.name} className="char__img" />
           <div className="char__name">{item.name}</div>
         </li>
