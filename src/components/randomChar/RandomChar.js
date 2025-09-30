@@ -7,7 +7,6 @@ import "./randomChar.scss";
 import mjolnir from "../../resources/img/mjolnir.png";
 
 class RandomChar extends Component {
-
   state = {
     char: {},
     loading: true,
@@ -46,7 +45,6 @@ class RandomChar extends Component {
       .then(this.onCharLoaded)
       .catch(this.onError);
   };
-
 
   render() {
     const { char, loading, error } = this.state;
