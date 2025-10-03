@@ -64,6 +64,7 @@ class CharList extends Component {
     this.setState({
       selectedCharId: id,
     });
+    this.props.onCharSelected(id);
   };
 
   renderItems(arr) {
