@@ -1,4 +1,6 @@
-import { Component } from "react";
+import React, { Component } from "react";
+import PropTypes from "prop-types"; // ES6
+
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import img from "../errorMessage/error.gif";
@@ -14,8 +16,9 @@ class CharList extends Component {
     newItemLoading: false,
     offset: 0,
     charEnded: false,
+    selectedCharId: null,
   };
-
+  charactersRefs = [];
   marvelService = new MarvelService();
 
   componentDidMount() {
@@ -57,17 +60,28 @@ class CharList extends Component {
     });
   };
 
+  onSelectedCharId = (id) => {
+    this.setState({
+      selectedCharId: id,
+    });
+  };
+
   renderItems(arr) {
     const problemUrl =
       "https://www.wallpaperflare.com/static/264/707/824/iron-man-the-avengers-robert-downey-junior-tony-wallpaper.jpg";
-    const characterItems = arr.map((item) => {
+    while (this.charactersRefs.length < arr.length) {
+      this.charactersRefs.push(React.createRef());
+    }
+    const characterItems = arr.map((item, index) => {
       if (!item || typeof item !== "object") return null;
       const thumbnail = item.thumbnail === problemUrl ? img : item.thumbnail;
+      const isSelected = this.state.selectedCharId === item.id;
       return (
         <li
-          className="char__item"
+          className={`char__item ${isSelected ? "char__item_selected" : ""}`}
           key={item.id}
-          onClick={() => this.props.onCharSelected(item.id)}
+          ref={this.charactersRefs[index]}
+          onClick={() => this.onSelectedCharId(item.id)}
         >
           <img src={thumbnail} alt={item.name} className="char__img" />
           <div className="char__name">{item.name}</div>
@@ -101,4 +115,8 @@ class CharList extends Component {
     );
   }
 }
+
+CharList.propTypes = {
+  onCharSelected: PropTypes.func,
+};
 export default CharList;
