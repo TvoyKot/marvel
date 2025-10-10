@@ -4,35 +4,26 @@ import PropTypes from "prop-types"; // ES6
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import img from "../errorMessage/error.gif";
-import MarvelService from "../../services/MarvelService";
+import useMarvelService from "../../services/MarvelService";
 
 import "./charList.scss";
 
 const CharList = (props) => {
   const [characters, setCharacters] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [newItemLoading, setNewItemLoading] = useState(false);
   const [offset, setOffset] = useState(0);
   const [charEnded, setCharEnded] = useState(false);
   const [selectedCharId, setSelectedCharId] = useState(null);
 
-  const marvelService = new MarvelService();
+  const { loading, error, getAllCharacters } = useMarvelService();
 
   useEffect(() => {
-    onRequest();
+    onRequest(offset, true);
   }, []);
 
-  const onRequest = (offset) => {
-    onCharListLoading();
-    marvelService
-      .getAllCharacters(offset)
-      .then(onCharListLoaded)
-      .catch(onError);
-  };
-
-  const onCharListLoading = () => {
-    setNewItemLoading(true);
+  const onRequest = (offset, initial) => {
+    initial ? setNewItemLoading(false) : setNewItemLoading(true);
+    getAllCharacters(offset).then(onCharListLoaded);
   };
 
   const onCharListLoaded = (newCharList) => {
@@ -41,15 +32,9 @@ const CharList = (props) => {
       ended = true;
     }
     setCharacters(() => [...characters, ...newCharList]);
-    setLoading(false);
     setNewItemLoading(false);
     setOffset((offset) => offset + 9);
     setCharEnded(ended);
-  };
-
-  const onError = () => {
-    setError(true);
-    setLoading(false);
   };
 
   const charactersRefs = useRef([]);
@@ -80,7 +65,8 @@ const CharList = (props) => {
           key={item.id}
           ref={(el) => (charactersRefs.current[index] = el)}
           onClick={() => {
-            onSelectedCharId(item.id); focusOnItem(index);
+            onSelectedCharId(item.id);
+            focusOnItem(index);
           }}
           onKeyDown={(e) => {
             if (e.key === " " || e.key === "Enter") {
@@ -96,15 +82,16 @@ const CharList = (props) => {
     });
     return <ul className="char__grid">{characterItems}</ul>;
   }
+
   const items = renderItems(characters);
   const errorMessage = error ? <ErrorMessage /> : null;
-  const spinner = loading ? <Spinner /> : null;
-  const content = !(loading || error) ? items : null;
+  const spinner = loading && !newItemLoading ? <Spinner /> : null;
+
   return (
     <div className="char__list">
       {errorMessage}
       {spinner}
-      {content}
+      {items}
       <button
         onClick={() => onRequest(offset)}
         disabled={newItemLoading}
