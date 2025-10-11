@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import "./appHeader.scss";
 
 const AppHeader = () => {
@@ -12,11 +12,16 @@ const AppHeader = () => {
       <nav className="app__menu">
         <ul>
           <li>
-            <Link to="/">Characters</Link>
+            <NavLink to="/">Characters</NavLink>
           </li>
           /
           <li>
-            <Link to="/comics">Comics</Link>
+            <NavLink
+              to="/comics"
+              className={({ isActive }) => (isActive ? "active" : '')}
+            >
+              Comics
+            </NavLink>
           </li>
         </ul>
       </nav>

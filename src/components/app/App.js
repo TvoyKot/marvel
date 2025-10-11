@@ -2,15 +2,17 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { MainPage, ComicsPage } from "../pages/index";
 import AppHeader from "../appHeader/AppHeader";
 
+const basename = process.env.NODE_ENV === "production" ? "/marvel" : "/";
+
 const App = () => {
   return (
     <div className="app">
-      <Router>
+      <Router basename={basename}>
         <AppHeader />
         <main>
           <Routes>
-            <Route path="/" element={<MainPage />}></Route>
-            <Route path="/comics" element={<ComicsPage />}></Route>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/comics" element={<ComicsPage />} />
           </Routes>
         </main>
       </Router>
