@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
 import PropTypes from "prop-types"; // ES6
 
 import Spinner from "../spinner/Spinner";
@@ -59,28 +60,33 @@ const CharList = (props) => {
       if (!item || typeof item !== "object") return null;
       const thumbnail = item.thumbnail === problemUrl ? img : item.thumbnail;
       return (
-        <li
-          className="char__item"
-          tabIndex={0}
-          key={item.id}
-          ref={(el) => (charactersRefs.current[index] = el)}
-          onClick={() => {
-            onSelectedCharId(item.id);
-            focusOnItem(index);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === " " || e.key === "Enter") {
-              props.onCharSelected(selectedCharId);
+        <CSSTransition key={item.id} timeout={500} classNames="char__item">
+          <li
+            className="char__item"
+            tabIndex={0}
+            ref={(el) => (charactersRefs.current[index] = el)}
+            onClick={() => {
+              onSelectedCharId(item.id);
               focusOnItem(index);
-            }
-          }}
-        >
-          <img src={thumbnail} alt={item.name} className="char__img" />
-          <div className="char__name">{item.name}</div>
-        </li>
+            }}
+            onKeyDown={(e) => {
+              if (e.key === " " || e.key === "Enter") {
+                onSelectedCharId(item.id)
+                focusOnItem(index);
+              }
+            }}
+          >
+            <img src={thumbnail} alt={item.name} className="char__img" />
+            <div className="char__name">{item.name}</div>
+          </li>
+        </CSSTransition>
       );
     });
-    return <ul className="char__grid">{characterItems}</ul>;
+    return (
+      <ul className="char__grid">
+        <TransitionGroup component={null}>{characterItems}</TransitionGroup>
+      </ul>
+    );
   }
 
   const items = renderItems(characters);
