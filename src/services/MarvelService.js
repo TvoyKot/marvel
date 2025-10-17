@@ -1,5 +1,5 @@
 import { useHttp } from "../hooks/http.hook";
-
+import { useCallback } from "react";
 const useMarvelService = () => {
   const { loading, request, error, clearError } = useHttp();
 
@@ -14,9 +14,26 @@ const useMarvelService = () => {
     return res.data.results.map(_transformCharacter);
   };
 
-  const getCharacter = async (id) => {
+  const getCharacter = useCallback(async (id) => {
     const res = await request(`${_apiBase}characters/${id}?${_apiKey}`);
     return _transformCharacter(res.data.results[0]);
+  }, []);
+
+  const getCharacterByName = async (name) => {
+    const res = await request(
+      `${_apiBase}characters?nameStartsWith=${name}&${_apiKey}`
+    );
+
+    if (!res.data || !res.data.results) {
+      return [];
+    }
+
+    // Фильтруем по имени независимо от регистра
+    const filteredResults = res.data.results.filter(
+      (char) => char.name.toLowerCase() === name.toLowerCase()
+    );
+
+    return filteredResults.map(_transformCharacter);
   };
 
   const getAllComics = async (offset = 0) => {
@@ -67,6 +84,7 @@ const useMarvelService = () => {
     clearError,
     getAllCharacters,
     getCharacter,
+    getCharacterByName,
     getAllComics,
     getComic,
   };

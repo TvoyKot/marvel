@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import useMarvelService from "../../services/MarvelService";
@@ -13,13 +13,12 @@ const SingleComicPage = () => {
 
   useEffect(() => {
     updateComic();
-  }, [comicId]);
+  }, []);
 
-  const updateComic = () => {
+  const updateComic = useCallback(() => {
     clearError();
     getComic(comicId).then(onComicLoaded);
-  };
-
+  }, [updateComic]);
 
   const onComicLoaded = (comic) => {
     setComic(comic);
@@ -27,9 +26,7 @@ const SingleComicPage = () => {
 
   const errorMessage = error ? <ErrorMessage /> : null;
   const spinner = loading ? <Spinner /> : null;
-  const content = !(loading || error || !comic) ? (
-    <View comic={comic} />
-  ) : null;
+  const content = !(loading || error || !comic) ? <View comic={comic} /> : null;
 
   return (
     <>

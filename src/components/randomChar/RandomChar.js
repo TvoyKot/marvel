@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import useMarvelService from "../../services/MarvelService";
@@ -11,19 +11,19 @@ const RandomChar = () => {
 
   const { loading, error, getCharacter, clearError } = useMarvelService();
 
-  useEffect(() => {
-    updateChar();
-  }, []);
-
   const onCharLoaded = (char) => {
     setChar(char);
   };
-
-  const updateChar = () => {
+  
+  const updateChar = useCallback(() => {
     clearError();
     const id = Math.floor(Math.random() * 20);
     getCharacter(id).then(onCharLoaded);
-  };
+  }, [getCharacter, clearError]);
+  
+  useEffect(() => {
+    updateChar();
+  }, [updateChar]);
 
   const errorMessage = error ? <ErrorMessage /> : null;
   const spinner = loading ? <Spinner /> : null;
