@@ -21,19 +21,9 @@ const useMarvelService = () => {
 
   const getCharacterByName = async (name) => {
     const res = await request(
-      `${_apiBase}characters?nameStartsWith=${name}&${_apiKey}`
+      `${_apiBase}characters?name=${name}&${_apiKey}`
     );
-
-    if (!res.data || !res.data.results) {
-      return [];
-    }
-
-    // Фильтруем по имени независимо от регистра
-    const filteredResults = res.data.results.filter(
-      (char) => char.name.toLowerCase() === name.toLowerCase()
-    );
-
-    return filteredResults.map(_transformCharacter);
+    return res.data.results.map(_transformCharacter);
   };
 
   const getAllComics = async (offset = 0) => {

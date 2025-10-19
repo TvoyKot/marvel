@@ -14,17 +14,16 @@ const RandomChar = () => {
   const onCharLoaded = (char) => {
     setChar(char);
   };
-  
+
   const updateChar = useCallback(() => {
     clearError();
     const id = Math.floor(Math.random() * 20);
     getCharacter(id).then(onCharLoaded);
-  }, [getCharacter, clearError]);
-  
+  }, [clearError, getCharacter]);
+
   useEffect(() => {
     updateChar();
   }, [updateChar]);
-
   const errorMessage = error ? <ErrorMessage /> : null;
   const spinner = loading ? <Spinner /> : null;
   const content = !(loading || error) ? <View char={char} /> : null;
